@@ -1,13 +1,19 @@
 <template>
-  <div class="wrapper">
+  <div class="con" id="three-con">
     123
   </div>
 </template>
 
 <script setup lang="ts">
+import {onMounted} from 'vue'
+import MazeOfDouDou from "@/views/main";
+
+onMounted(() => {
+  const mazeOfDouDou = new MazeOfDouDou();
+})
 </script>
 <style scoped>
-.wrapper {
+.con {
   width: 100%;
   height: 100%;
   margin: 0 auto;
