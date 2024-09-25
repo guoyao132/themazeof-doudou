@@ -1,0 +1,29 @@
+{
+  "name": "themazeof-doudou",
+  "description": "gy",
+  "version": "0.0.0",
+  "scripts": {
+    "serve": "vite --host",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "three": "^0.168.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-html": "^1.0.2",
+    "@types/node": "^16.11.56",
+    "@vicons/fluent": "^0.12.0",
+    "@vicons/utils": "^0.1.4",
+    "@vitejs/plugin-vue": "^3.0.3",
+    "@vue/tsconfig": "^0.1.3",
+    "css-vars-ponyfill": "^2.4.8",
+    "less": "^4.1.3",
+    "less-loader": "^11.1.0",
+    "terser": "^5.15.1",
+    "typescript": "~4.7.4",
+    "vite": "^3.0.9",
+    "vue": "^3.2.38",
+    "vue-router": "^4.1.5",
+    "vue-tsc": "^0.40.7"
+  }
+}

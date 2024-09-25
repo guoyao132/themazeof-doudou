@@ -1,0 +1,33 @@
+*{
+    box-sizing: border-box;
+}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form,input, textarea, p, th, tr, td, section, a, input, span{
+    margin:0;
+    padding:0;
+}
+img{border:none;max-width: 100%;display: inline-block;}
+ol,ul{list-style:none;}
+input,select,textarea{border: none;outline: none;}
+textarea{resize: none;}
+a,ins{text-decoration:none;color: black}
+html, body, form, fieldset, p, div, h1, h2, h3, h4, h5, h6
+{
+    -webkit-text-size-adjust: none;
+}
+
+
+/*清除浮动*/
+.clearfix:after{content:"";display:block;clear:both;}
+.clearfix{zoom:1;}
+.fl{float:left;}
+.fr{float:right;}
+/* 去掉IE input password 右侧的眼睛和小叉 */
+::-ms-clear, ::-ms-reveal{display: none;}
+/*去掉input number 右侧上下三角*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type="number"]{
+    -moz-appearance: textfield;
+}
