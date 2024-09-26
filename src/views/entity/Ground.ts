@@ -1,13 +1,15 @@
 import * as THREE from "three";
 import config from "../config";
-
 import Entity from "./Entity";
+import computedMazeArr from "@/views/computedMazeArr";
 
 // 地面
 class Ground extends Entity{
   constructor(level:number) {
+
+    const size = computedMazeArr.getSize(level);
     const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry( 9, 9, 1, 1 ),
+      new THREE.PlaneGeometry( size * 10, size * 10, 1, 1 ),
       new THREE.MeshPhongMaterial( {
         color: config.groundColor,
         shininess: 150,

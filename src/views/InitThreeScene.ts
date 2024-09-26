@@ -4,10 +4,12 @@ import type {
   WebGLRenderer,
   AmbientLight,
   DirectionalLight,
+  Clock,
 } from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as THREE from 'three'
 import config from "@/views/config";
+import {gsap} from 'gsap'
 
 const {
   containerId,
@@ -21,13 +23,15 @@ class InitThreeScene{
   public scene!: Scene
   public camera!: PerspectiveCamera;
   public container!: HTMLElement;
+  public controls!: OrbitControls;
   private renderer!: WebGLRenderer;
-  private controls!: OrbitControls;
   private ambientLight!: AmbientLight;
   private dirLight!: DirectionalLight;
   private isInit: boolean;
+  private clock: Clock;
   constructor(){
     this.isInit = false;
+    this.clock = new THREE.Clock()
   }
 
   init(){
@@ -51,6 +55,26 @@ class InitThreeScene{
     let camera = new THREE.PerspectiveCamera(60, this.container.clientWidth / this.container.clientHeight, 0.1, 3000000);
     camera.position.set( 10, 5, 20 );
     this.camera = camera;
+  }
+
+  changeCamera(position?: number[], target?:number[]){
+    if(position){
+      gsap.to(this.camera.position, {
+        x: position[0],
+        y: position[1],
+        z: position[2],
+        duration: 1,
+      });
+    }
+    if(target){
+      gsap.to(this.controls.target, {
+        x: target[0],
+        y: target[1],
+        z: target[2],
+        duration: 1,
+      });
+    }
+
   }
 
   #initScene(){
@@ -111,12 +135,14 @@ class InitThreeScene{
     this.container.appendChild(renderer.domElement);
     this.renderer.render(this.scene, this.camera);
     this.renderer.setAnimationLoop( () => {
-      this.#animate(this);
+      this.#animate({self: this});
     } );
   }
 
-  #animate(self: InitThreeScene){
+  #animate({self}: { self: InitThreeScene }){
+    let delta = this.clock.getDelta()
     self.renderer.render( self.scene, self.camera );
+    self.controls?.update(delta);
   }
 
   addAnimate(){

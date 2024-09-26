@@ -13,7 +13,11 @@ const config = reactive({
   groundColor: '#f88443', //地面颜色
   personColor: '#ff470a',
 
-  addGroundWireframe: false, //是否添加地面网格线
+  addGroundWireframe: true, //是否添加地面网格线
+
+  levelStart: 11,
+  levelStep: 10,
+  levelSplitNum: 10,
 })
 
 // 改变控制器状态
