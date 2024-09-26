@@ -1,111 +1,162 @@
-import type {Camera, Scene, WebGLRenderer} from 'three'
+import type {
+  PerspectiveCamera,
+  Scene,
+  WebGLRenderer,
+  AmbientLight,
+  DirectionalLight,
+} from 'three'
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as THREE from 'three'
 import config from "@/views/config";
 
 const {
   containerId,
   ambientLightColor,
-  ambientLightIntensity
+  ambientLightIntensity,
+  directionalLightColor,
+  directionalLightIntensity,
 } = config;
 
 class InitThreeScene{
-  scene: Scene
-  camera: Camera;
-  renderer: WebGLRenderer;
-  container: HTMLElement;
+  public scene!: Scene
+  public camera!: PerspectiveCamera;
+  public container!: HTMLElement;
+  private renderer!: WebGLRenderer;
+  private controls!: OrbitControls;
+  private ambientLight!: AmbientLight;
+  private dirLight!: DirectionalLight;
+  private isInit: boolean;
   constructor(){
-    this.scene = {} as Scene;
-    this.camera = {} as Camera;
-    this.renderer = {} as WebGLRenderer;
-    this.container = document.getElementById(containerId)!;
-    this.initCamera();
-    this.initScene();
-    this.initLight();
-    this.initRender();
-
-    window.addEventListener( 'resize', this.onWindowResize);
-
+    this.isInit = false;
   }
-  initCamera(){
+
+  init(){
+    if(this.isInit){
+      return;
+    }
+    this.isInit = true;
+    this.container = document.getElementById(containerId)!;
+    this.#initCamera();
+    this.#initScene();
+    this.#initLight();
+    this.#initRender();
+    this.#initControls();
+
+    window.addEventListener( 'resize', () => {
+      this.#onWindowResize(this);
+    });
+  }
+
+  #initCamera(){
     let camera = new THREE.PerspectiveCamera(60, this.container.clientWidth / this.container.clientHeight, 0.1, 3000000);
-    camera.up.set(0, 1, 0);
-    camera.position.set(0, 0, 0);
-    camera.lookAt(0, 0, 0);
+    camera.position.set( 10, 5, 20 );
     this.camera = camera;
   }
-  initScene(){
+
+  #initScene(){
     this.scene = new THREE.Scene();
     this.scene.add(this.camera);
   }
 
-  initLight(){
-    let ambientLight = new THREE.AmbientLight(ambientLightColor, ambientLightIntensity);
-    this.scene && this.scene.add(ambientLight);
+  #initLight(){
+    this.ambientLight = new THREE.AmbientLight(ambientLightColor, ambientLightIntensity);
+    this.scene.add(this.ambientLight);
+    const dirLight = new THREE.DirectionalLight( directionalLightColor, directionalLightIntensity );
+    dirLight.position.set( -3, 5, 3 );
+    dirLight.castShadow = true;
+    dirLight.shadow.camera.near = 1;
+    dirLight.shadow.camera.far = 10;
+    dirLight.shadow.camera.right = 9;
+    dirLight.shadow.camera.left = - 9;
+    dirLight.shadow.camera.top	= 9;
+    dirLight.shadow.camera.bottom = - 9;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    this.dirLight = dirLight;
+    this.scene.add( this.dirLight );
+
+    const spotLight = new THREE.SpotLight( '#fff', 10 );
+    spotLight.angle = Math.PI / 5;
+    spotLight.penumbra = 0.2;
+    spotLight.position.set( 1, 5, 1 );
+    spotLight.shadow.camera.near = 1;
+    spotLight.shadow.camera.far = 1000;
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+
+    this.scene.add( spotLight );
   }
 
-  initRender(){
+  changeDirLightShadowSize(size: number){
+
+  }
+
+  changeAmbientLight(color: string, intensity: number){
+    this.ambientLight.color = new THREE.Color( color );
+    this.ambientLight.intensity = intensity;
+  }
+  changeDirLight(color: string, intensity: number){
+    this.dirLight.color = new THREE.Color( color );
+    this.dirLight.intensity = intensity;
+  }
+
+  #initRender(){
     let renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
     renderer.localClippingEnabled = true;
     this.renderer = renderer;
     renderer.setClearAlpha(0);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+    renderer.shadowMap.enabled = true;
     this.container.appendChild(renderer.domElement);
     this.renderer.render(this.scene, this.camera);
     this.renderer.setAnimationLoop( () => {
-      this.animate(this);
+      this.#animate(this);
     } );
-
-
-
-
-    const localPlane = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
-
-    // Geometry
-
-    const material = new THREE.MeshPhongMaterial( {
-      color: 0x80ee10,
-      shininess: 100,
-      side: THREE.DoubleSide,
-
-      // ***** Clipping setup (material): *****
-      clippingPlanes: [ localPlane ],
-      clipShadows: true,
-
-      alphaToCoverage: true,
-
-    } );
-
-    const geometry = new THREE.TorusKnotGeometry( 0.4, 0.08, 95, 20 );
-
-    const object = new THREE.Mesh( geometry, material );
-    object.castShadow = true;
-    this.scene.add( object );
-
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry( 9, 9, 1, 1 ),
-      new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
-    );
-
-    ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
-    ground.receiveShadow = true;
-    this.scene.add( ground );
   }
-  animate(self){
-    requestAnimationFrame( () => {
-      self.animate(self)
-    } );
 
+  #animate(self: InitThreeScene){
     self.renderer.render( self.scene, self.camera );
   }
 
-  onWindowResize(){
-    this.camera.aspect = this.container.innerWidth / this.container.innerHeight;
+  addAnimate(){
 
-    this.camera.updateProjectionMatrix();
+  }
 
-    this.renderer.setSize( this.container.innerWidth, this.container.innerHeight );
+  #initControls(isDisable = false){
+    let controls;
+    if(this.controls){
+      controls = this.controls;
+    }else{
+      controls = new OrbitControls(this.camera, this.renderer.domElement);
+    }
+    controls.minDistance = 1;
+    controls.maxDistance = 200000;
+    //上下翻转的最小角度
+    // controls.minPolarAngle = 0.25;
+    // controls.maxPolarAngle = Math.PI / 2;
+    //是否允许缩放
+    controls.enableZoom = !isDisable;
+    controls.enableDamping = !isDisable; // an animation loop is required when either damping or auto-rotation are enabled
+    controls.enableRotate = !isDisable;
+    controls.dampingFactor = 0.25;
+    controls.screenSpacePanning = false;
+    controls.enablePan = !isDisable;
+    this.controls = controls;
+  }
+
+  changeDisableControls(isDisable: boolean){
+    this.#initControls(isDisable);
+  }
+
+  #onWindowResize(self: InitThreeScene){
+    self.camera.aspect = self.container.clientWidth / self.container.clientHeight;
+
+    self.camera.updateProjectionMatrix();
+
+    self.renderer.setSize(self.container.clientWidth, self.container.clientHeight);
   }
 }
 
-export default InitThreeScene;
+const initThreeScene = new InitThreeScene();
+export default initThreeScene;
