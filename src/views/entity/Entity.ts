@@ -1,7 +1,7 @@
 import type { Mesh, LineSegments } from 'three'
 
 
-type MYMESH = Mesh | LineSegments;
+export type MYMESH = Mesh | LineSegments;
 
 export default class Entity {
   public mesh: MYMESH;
@@ -13,5 +13,16 @@ export default class Entity {
 
   get position() {
     return this.mesh.position
+  }
+
+  dispose() {
+    this.mesh.geometry?.dispose()
+    let material = this.mesh.material;
+    if (!Array.isArray(material)) {
+      material = [material];
+    }
+    material.forEach((item) => {
+      item.dispose()
+    })
   }
 }

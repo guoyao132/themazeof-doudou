@@ -10,6 +10,7 @@ const config = reactive({
   isDisabledControls: false, //是否禁用控制器
 
   groundHeight: -0.4, //地面高度,
+  conBackgroundColor: '#ca6b35', //容器背景颜色
   groundColor: '#f88443', //地面颜色
   personColor: '#ff470a',
 
@@ -18,6 +19,8 @@ const config = reactive({
   levelStart: 11,
   levelStep: 10,
   levelSplitNum: 10,
+
+  startPoint: [0, 1],
 })
 
 // 改变控制器状态

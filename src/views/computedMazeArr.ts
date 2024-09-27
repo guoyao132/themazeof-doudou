@@ -2,7 +2,8 @@ import config from "@/views/config";
 const {
   levelStep,
   levelStart,
-  levelSplitNum
+  levelSplitNum,
+  startPoint,
 } = config;
 class CusArr  {
   cusArr: number[][];
@@ -45,7 +46,7 @@ class ComputedMazeArr {
     let col:number = size;
     let arr:string[][] = [];
     let visited:boolean[][] = [];
-    let start:number[] = [0, 1]
+    let start:number[] = startPoint;
     let end:number[] = [row - 2, col - 1];
     for (let i:number = 0; i < row; i++) {
       arr.push(new Array(col).fill('wall'));

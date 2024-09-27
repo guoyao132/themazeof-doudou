@@ -10,6 +10,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as THREE from 'three'
 import config from "@/views/config";
 import {gsap} from 'gsap'
+import {getElementById} from "@/views/mazeUnit";
 
 const {
   containerId,
@@ -17,6 +18,7 @@ const {
   ambientLightIntensity,
   directionalLightColor,
   directionalLightIntensity,
+  conBackgroundColor,
 } = config;
 
 class InitThreeScene{
@@ -39,7 +41,7 @@ class InitThreeScene{
       return;
     }
     this.isInit = true;
-    this.container = document.getElementById(containerId)!;
+    this.container = getElementById(containerId);
     this.#initCamera();
     this.#initScene();
     this.#initLight();
@@ -58,27 +60,45 @@ class InitThreeScene{
   }
 
   changeCamera(position?: number[], target?:number[]){
-    if(position){
-      gsap.to(this.camera.position, {
-        x: position[0],
-        y: position[1],
-        z: position[2],
-        duration: 1,
-      });
-    }
-    if(target){
-      gsap.to(this.controls.target, {
-        x: target[0],
-        y: target[1],
-        z: target[2],
-        duration: 1,
-      });
-    }
+    return new Promise((resolve) => {
+      let finish = 0;
+      if(position){
+        finish++;
+        gsap.to(this.camera.position, {
+          x: position[0],
+          y: position[1],
+          z: position[2],
+          duration: 0.5,
+          onComplete(){
+            finish--;
+            if(finish === 0){
+              resolve(true);
+            }
+          }
+        });
+      }
+      if(target){
+        finish++;
+        gsap.to(this.controls.target, {
+          x: target[0],
+          y: target[1],
+          z: target[2],
+          duration: 0.5,
+          onComplete(){
+            finish--;
+            if(finish === 0){
+              resolve(true);
+            }
+          }
+        });
+      }
+    })
 
   }
 
   #initScene(){
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(conBackgroundColor);
     this.scene.add(this.camera);
   }
 
@@ -159,8 +179,8 @@ class InitThreeScene{
     controls.minDistance = 1;
     controls.maxDistance = 200000;
     //上下翻转的最小角度
-    // controls.minPolarAngle = 0.25;
-    // controls.maxPolarAngle = Math.PI / 2;
+    controls.minPolarAngle = 0.25;
+    controls.maxPolarAngle = Math.PI / 2;
     //是否允许缩放
     controls.enableZoom = !isDisable;
     controls.enableDamping = !isDisable; // an animation loop is required when either damping or auto-rotation are enabled

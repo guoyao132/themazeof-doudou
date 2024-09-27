@@ -2,8 +2,10 @@ import Entity from "./Entity";
 import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/examples/jsm/geometries/RoundedBoxGeometry";
 import config from "@/views/config";
+import {gsap} from 'gsap';
 
 class Person extends Entity{
+  public isMove:boolean;
   constructor() {
     const mesh  = new THREE.Mesh(
       new RoundedBoxGeometry(0.8, 0.8, 0.8, 5, 0.1),
@@ -51,7 +53,48 @@ class Person extends Entity{
     smileMesh.position.set(0, -0.2, 0.4)
 
     mesh.add(leftEye, rightEye, smileMesh)
+    mesh.lookAt(mesh.position.clone().add(new THREE.Vector3(0, 0, 1)))
     super(mesh);
+    this.isMove = false;
+  }
+
+  setMeshPosition(position: number[]) {
+    this.mesh.position.set(position[0], 0, position[1]);
+  }
+
+  addMoveEvent(position: number[]){
+    if(this.isMove){
+      return
+    }
+    this.isMove = true;
+    let mesh = this.mesh;
+    let startPosition = mesh.position.clone();
+    //获取中间位置
+    let midPositionX = (startPosition.x + position[0]) / 2;
+    let midPositionZ = (startPosition.z + position[1]) / 2;
+    let duration = 0.1;
+    mesh.lookAt(mesh.position.clone().add(new THREE.Vector3(position[0] - startPosition.x, 0, position[1] - startPosition.z)))
+    gsap.to(mesh.position, {
+      x: midPositionX,
+      y: 0.5,
+      z: midPositionZ,
+      duration: duration,
+      ease: 'power2.in',
+      onComplete: () => {
+        // mesh.lookAt(position)
+        gsap.to(mesh.position, {
+          x: position[0],
+          y: 0,
+          z: position[1],
+          duration: duration,
+          ease: 'power2.out',
+          onComplete: () => {
+            this.isMove = false;
+          }
+        })
+      }
+    })
+
   }
 }
 
