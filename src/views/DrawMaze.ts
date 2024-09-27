@@ -9,7 +9,7 @@ import computedMazeArr from "@/views/computedMazeArr";
 import Stone from "@/views/entity/Stone";
 import Tree from "@/views/entity/Tree";
 import config from "@/views/config";
-import {floatSub, floatAdd} from "@/views/mazeUnit";
+import {floatSub, floatAdd, getElementById} from "@/views/mazeUnit";
 import {gsap} from "gsap";
 import type {MYMESH} from "@/views/entity/Entity";
 
@@ -234,33 +234,50 @@ class DrawMaze {
     });
   }
 
+  addPersonMoveFun(key:string){
+    let offset:number[][] = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+    let offsetIndex = 0;
+    switch (key){
+      case 'ArrowUp':
+      case 'w':
+        offsetIndex = 0;
+        break;
+      case 'ArrowDown':
+      case 's':
+        offsetIndex = 1;
+        break;
+      case 'ArrowLeft':
+      case 'a':
+        offsetIndex = 2;
+        break;
+      case 'ArrowRight':
+      case 'd':
+        offsetIndex = 3;
+        break
+    }
+    this.movePerson(offset[offsetIndex])
+  }
   addPersonMoveEvent(){
-    if(window){}
+    let btnW = getElementById('btnW');
+    btnW.addEventListener('click', ()=>{
+      this.addPersonMoveFun('w');
+    })
+    let btnA = getElementById('btnA');
+    btnA.addEventListener('click', ()=>{
+      this.addPersonMoveFun('a');
+    })
+    let btnS = getElementById('btnS');
+    btnS.addEventListener('click', ()=>{
+      this.addPersonMoveFun('s');
+    })
+    let btnD = getElementById('btnD');
+    btnD.addEventListener('click', ()=>{
+      this.addPersonMoveFun('d');
+    })
+
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if(this.personObj){
-        let key = e.key;
-        let offset:number[][] = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-        let position = this.personObj.mesh.position.clone();
-        let offsetIndex = 0;
-        switch (key){
-          case 'ArrowUp':
-          case 'w':
-            offsetIndex = 0;
-            break;
-          case 'ArrowDown':
-          case 's':
-            offsetIndex = 1;
-            break;
-          case 'ArrowLeft':
-          case 'a':
-            offsetIndex = 2;
-            break;
-          case 'ArrowRight':
-          case 'd':
-            offsetIndex = 3;
-            break
-        }
-        this.movePerson(offset[offsetIndex])
+        this.addPersonMoveFun(e.key);
       }
     })
   }
@@ -286,6 +303,7 @@ class DrawMaze {
               this.threeObj.scene.remove(item.mesh);
             })
             this.removeObjArr = [];
+            this.treePosArr = [];
             if (this.options.upgradeLevel) {
               this.options.upgradeLevel()
             }

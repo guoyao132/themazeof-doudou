@@ -43,13 +43,13 @@ class MazeOfDouDou {
   }
 
   #changeCameraPosition(){
-
     return new Promise(resolve => {
+      let cameraLevel = Math.floor(this.level / 10);
       this.threeObj.changeCamera(
         [
-          -3.575202802800737 - 10 * this.level * 0.1,
-          11.116745335949188 + 10 * this.level * 0.15,
-          8.59618775968135 + 10 * this.level * 0.1
+          -3.575202802800737 - 10 * cameraLevel * 0.5,
+          11.116745335949188 + 10 * cameraLevel * 0.8,
+          8.59618775968135 + 10 * cameraLevel * 0.2
         ],
         [
           -0.5382067615242148 ,
