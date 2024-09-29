@@ -1,4 +1,4 @@
-import config from "@/views/config";
+import config from "./config";
 const {
   levelStep,
   levelStart,

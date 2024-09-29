@@ -7,13 +7,13 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@types/three": "^0.168.0",
     "gsap": "^3.12.5",
     "three": "^0.168.0"
   },
   "devDependencies": {
     "@rollup/plugin-html": "^1.0.2",
     "@types/node": "^16.11.56",
-    "@types/three": "^0.168.0",
     "@vicons/fluent": "^0.12.0",
     "@vicons/utils": "^0.1.4",
     "@vitejs/plugin-vue": "^3.0.3",

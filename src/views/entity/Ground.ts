@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import config from "../config";
 import Entity from "./Entity";
-import computedMazeArr from "@/views/computedMazeArr";
+import computedMazeArr from "../computedMazeArr";
 
 // 地面
 class Ground extends Entity{

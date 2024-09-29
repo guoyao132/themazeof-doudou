@@ -8,9 +8,10 @@ import type {
 } from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as THREE from 'three'
-import config from "@/views/config";
+import config from "./config";
 import {gsap} from 'gsap'
-import {getElementById} from "@/views/mazeUnit";
+import {getWindowDevicePixelRatio, getWindowObject} from "./mazeUnit";
+import type {DrawMazeOptions} from './main'
 
 const {
   containerId,
@@ -24,7 +25,7 @@ const {
 class InitThreeScene{
   public scene!: Scene
   public camera!: PerspectiveCamera;
-  public container!: HTMLElement;
+  public container!: any;
   public controls!: OrbitControls;
   private renderer!: WebGLRenderer;
   private ambientLight!: AmbientLight;
@@ -36,19 +37,19 @@ class InitThreeScene{
     this.clock = new THREE.Clock()
   }
 
-  init(){
+  init(options: DrawMazeOptions){
     if(this.isInit){
       return;
     }
     this.isInit = true;
-    this.container = getElementById(containerId);
+    this.container = options.canvas;
     this.#initCamera();
     this.#initScene();
     this.#initLight();
     this.#initRender();
     this.#initControls();
 
-    window.addEventListener( 'resize', () => {
+    getWindowObject()?.addEventListener( 'resize', () => {
       this.#onWindowResize(this);
     });
   }
@@ -131,10 +132,6 @@ class InitThreeScene{
     this.scene.add( spotLight );
   }
 
-  changeDirLightShadowSize(size: number){
-
-  }
-
   changeAmbientLight(color: string, intensity: number){
     this.ambientLight.color = new THREE.Color( color );
     this.ambientLight.intensity = intensity;
@@ -145,14 +142,17 @@ class InitThreeScene{
   }
 
   #initRender(){
-    let renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+    let renderer = new THREE.WebGLRenderer({
+      antialias: true, alpha: true,
+      canvas: this.container,
+    });
     renderer.localClippingEnabled = true;
     this.renderer = renderer;
     renderer.setClearAlpha(0);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(getWindowDevicePixelRatio());
     renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     renderer.shadowMap.enabled = true;
-    this.container.appendChild(renderer.domElement);
+    // this.container.appendChild(renderer.domElement);
     this.renderer.render(this.scene, this.camera);
     this.renderer.setAnimationLoop( () => {
       this.#animate({self: this});

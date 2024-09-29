@@ -1,7 +1,7 @@
 import Entity from "./Entity";
 import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/examples/jsm/geometries/RoundedBoxGeometry";
-import config from "@/views/config";
+import config from "../config";
 import {gsap} from 'gsap';
 
 class Person extends Entity{

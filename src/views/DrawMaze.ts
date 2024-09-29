@@ -1,17 +1,20 @@
-import type {Mesh} from "three";
-import initThreeScene from "@/views/InitThreeScene";
-import type InitThreeScene from "@/views/InitThreeScene";
-import Ground from "@/views/entity/Ground";
-import GroundWireframe from "@/views/entity/GroundWireframe";
-import Person from "@/views/entity/Person";
-import Wall from "@/views/entity/Wall";
-import computedMazeArr from "@/views/computedMazeArr";
-import Stone from "@/views/entity/Stone";
-import Tree from "@/views/entity/Tree";
-import config from "@/views/config";
-import {floatSub, floatAdd, getElementById} from "@/views/mazeUnit";
+import initThreeScene from "./InitThreeScene";
+import type InitThreeScene from "./InitThreeScene";
+import Ground from "./entity/Ground";
+import GroundWireframe from "./entity/GroundWireframe";
+import Person from "./entity/Person";
+import Wall from "./entity/Wall";
+import computedMazeArr from "./computedMazeArr";
+import Stone from "./entity/Stone";
+import Tree from "./entity/Tree";
+import config from "./config";
+import {floatSub, floatAdd, getWindowObject} from "./mazeUnit";
 import {gsap} from "gsap";
-import type {MYMESH} from "@/views/entity/Entity";
+import type {MYMESH} from "./entity/Entity";
+import * as THREE from "three";
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import {FontLoader, Font} from "three/examples/jsm/loaders/FontLoader";
+import FONT from 'three/examples/fonts/helvetiker_bold.typeface.json'
 
 type DrawMazeOptions = {
   upgradeLevel: () => void
@@ -28,6 +31,7 @@ class DrawMaze {
   private isUpLevel: boolean = false;
   private treePosArr: string[] = [];
   private size: number = 0;
+  private FontObj: Font | null = null;
   constructor(options: DrawMazeOptions) {
     this.threeObj = initThreeScene;
     this.options = options;
@@ -111,9 +115,40 @@ class DrawMaze {
     this.size = size;
     let ground = new Ground(this.level);
     this.threeObj.scene.add(ground.mesh);
-    // let person = new Person();
-    // this.personObj = person;
-    // this.threeObj.scene.add(person.mesh);
+    let person = new Person();
+    this.personObj = person;
+    this.threeObj.scene.add(person.mesh);
+
+
+    this.setLevelText('LEVEL 1')
+  }
+
+  setLevelText(text:string){
+    if(!this.FontObj){
+      let loader = new FontLoader();
+      this.FontObj = loader.parse(FONT);
+    }
+
+    console.log(this.FontObj);
+    let geometry = new TextGeometry(text, {
+      size: 1, //字号大小，一般为大写字母的高度
+      height: 0.1, //文字的厚度
+      curveSegments: 12,//弧线分段数，使得文字的曲线更加光滑
+      weight: 'bold', //值为'normal'或'bold'，表示是否加粗
+      font: this.FontObj, //字体，默认是'helvetiker'，需对应引用的字体文件
+      style: 'normal', //值为'normal'或'italics'，表示是否斜体 bevelThickness: 1, //倒角厚度
+      bevelSize: 0.01, //倒角宽度
+      bevelThickness: 0.01, //倒角厚度
+      bevelEnabled: true, //布尔值，是否使用倒角，意为在边缘处斜切
+    });
+    const textMaterial = new THREE.MeshPhongMaterial({
+      color: new THREE.Color(0x686de0),
+      flatShading: true,
+      side: 0
+    });
+    let text1 = new THREE.Mesh(geometry, textMaterial);
+    text1.name = 'text';
+    this.threeObj.scene.add(text1);
   }
 
   init(mazeArr: string[][], level: number){
@@ -258,24 +293,7 @@ class DrawMaze {
     this.movePerson(offset[offsetIndex])
   }
   addPersonMoveEvent(){
-    let btnW = getElementById('btnW');
-    btnW.addEventListener('click', ()=>{
-      this.addPersonMoveFun('w');
-    })
-    let btnA = getElementById('btnA');
-    btnA.addEventListener('click', ()=>{
-      this.addPersonMoveFun('a');
-    })
-    let btnS = getElementById('btnS');
-    btnS.addEventListener('click', ()=>{
-      this.addPersonMoveFun('s');
-    })
-    let btnD = getElementById('btnD');
-    btnD.addEventListener('click', ()=>{
-      this.addPersonMoveFun('d');
-    })
-
-    window.addEventListener('keydown', (e: KeyboardEvent) => {
+    getWindowObject()?.addEventListener('keydown', (e: KeyboardEvent) => {
       if(this.personObj){
         this.addPersonMoveFun(e.key);
       }

@@ -1,5 +1,5 @@
 import {reactive, watch} from 'vue'
-import initThreeScene from "@/views/InitThreeScene";
+import initThreeScene from "./InitThreeScene";
 const config = reactive({
   containerId: 'three-con',     //three 容器ID
   ambientLightColor: '#505050',  //环境光颜色

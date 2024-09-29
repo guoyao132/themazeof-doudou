@@ -66,3 +66,12 @@ export const floatSub = (num1:number, num2:number):number => {
 export const getElementById = (id:string):HTMLElement => {
   return document.getElementById(id)!;
 }
+
+export const getWindowObject = ():Window => {
+  return window;
+}
+
+export const getWindowDevicePixelRatio = ():number => {
+  return window.devicePixelRatio;
+  // return wx.getWindowInfo().pixelRatio;
+}

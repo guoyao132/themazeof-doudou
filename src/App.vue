@@ -3,26 +3,36 @@
     <div class="con-level" id="levelCon">当前关卡：1</div>
     <div class="con-btn-list">
       <div class="con-btn-list-item">
-        <div class="btn" id="btnW">W</div>
+        <div class="btn" id="btnW" @click="personMoveFun('w')">W</div>
       </div>
       <div class="con-btn-list-item">
-        <div class="btn" id="btnA">A</div>
-        <div class="btn" id="btnS">S</div>
-        <div class="btn" id="btnD">D</div>
+        <div class="btn" id="btnA" @click="personMoveFun('a')">A</div>
+        <div class="btn" id="btnS" @click="personMoveFun('s')">S</div>
+        <div class="btn" id="btnD" @click="personMoveFun('d')">D</div>
       </div>
     </div>
-    {{mazeObj?.level}}
+    <canvas id="threeCanvas" ref="threeCanvas"></canvas>
   </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted} from 'vue'
+import {onMounted, ref} from 'vue'
+import type {Ref} from 'vue'
 import MazeOfDouDou from "@/views/main";
 
 let mazeObj: MazeOfDouDou;
+let threeCanvas:Ref<HTMLCanvasElement | null> = ref(null);
 onMounted(() => {
-  mazeObj = new MazeOfDouDou();
+  mazeObj = new MazeOfDouDou({
+    canvas: threeCanvas.value!,
+  });
 })
+
+const personMoveFun = (key: string) => {
+  if(mazeObj && mazeObj.drawMaze){
+    mazeObj.drawMaze.addPersonMoveFun(key);
+  }
+}
 </script>
 <style scoped>
 .con {
@@ -66,5 +76,10 @@ onMounted(() => {
   align-items: center;
   margin: 10px;
   cursor: pointer;
+}
+canvas{
+  width: 100%;
+  height: 100%;
+  outline: none;
 }
 </style>

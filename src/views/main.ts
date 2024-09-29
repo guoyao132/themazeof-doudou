@@ -1,20 +1,21 @@
-import type InitThreeScene from "@/views/InitThreeScene";
-import * as THREE from "three";
-import initThreeScene from "@/views/InitThreeScene";
-import DrawMaze from "@/views/DrawMaze";
-import computedMazeArr from "@/views/computedMazeArr";
-import {getElementById} from "@/views/mazeUnit";
+import type InitThreeScene from "./InitThreeScene";
+import initThreeScene from "./InitThreeScene";
+import DrawMaze from "./DrawMaze";
+import computedMazeArr from "./computedMazeArr";
+import {getElementById} from "./mazeUnit";
 
-
+export type DrawMazeOptions = {
+  canvas: HTMLCanvasElement;
+}
 class MazeOfDouDou {
   private threeObj: typeof InitThreeScene;
   public level:number
-  private drawMaze: DrawMaze;
+  public drawMaze: DrawMaze;
 
-  constructor() {
+  constructor(options: DrawMazeOptions) {
     this.level = 1;
     this.threeObj = initThreeScene;
-    this.threeObj.init();
+    this.threeObj.init(options);
     this.drawMaze = new DrawMaze({
       upgradeLevel: () => {
         this.#upgradeLevel();
@@ -37,7 +38,7 @@ class MazeOfDouDou {
   #init() {
     this.#changeCameraPosition().then(() => {
       const mazeArr = computedMazeArr.getLevelMaze(this.level);
-      this.drawMaze.init(mazeArr!, this.level);
+      this.drawMaze.initOne(mazeArr!, this.level);
     })
 
   }

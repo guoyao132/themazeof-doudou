@@ -1,7 +1,6 @@
 import Entity from "./Entity";
 import * as THREE from "three";
 import {RoundedBoxGeometry} from "three/examples/jsm/geometries/RoundedBoxGeometry";
-import config from "@/views/config";
 
 class Wall extends Entity {
   constructor() {
