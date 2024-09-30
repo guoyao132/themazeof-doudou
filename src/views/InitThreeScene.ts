@@ -14,7 +14,6 @@ import {getWindowDevicePixelRatio, getWindowObject} from "./mazeUnit";
 import type {DrawMazeOptions} from './main'
 
 const {
-  containerId,
   ambientLightColor,
   ambientLightIntensity,
   directionalLightColor,
@@ -50,6 +49,7 @@ class InitThreeScene{
     this.#initControls();
 
     getWindowObject()?.addEventListener( 'resize', () => {
+      console.log('resize');
       this.#onWindowResize(this);
     });
   }
@@ -208,6 +208,7 @@ class InitThreeScene{
   }
 
   #onWindowResize(self: InitThreeScene){
+    console.log(self.container.clientWidth);
     self.camera.aspect = self.container.clientWidth / self.container.clientHeight;
 
     self.camera.updateProjectionMatrix();
