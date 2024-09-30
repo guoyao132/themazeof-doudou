@@ -77,6 +77,7 @@ const changeControl = (e: MouseEvent) => {
   display: flex;
   width: 210px;
   justify-content: center;
+  user-select: none;
 }
 
 .btn{
