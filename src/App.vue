@@ -10,7 +10,7 @@
         <div class="btn" id="btnD" @click="personMoveFun('d')">D</div>
       </div>
     </div>
-    <canvas id="threeCanvas" ref="threeCanvas"></canvas>
+    <canvas id="threeCanvas" ref="threeCanvas" class="con-three"></canvas>
   </div>
 </template>
 
@@ -55,15 +55,6 @@ const changeControl = (e: MouseEvent) => {
   background: #000;
   position: relative;
 }
-.con-level{
-  position: absolute;
-  width: max-content;
-  padding: 10px;
-  height: 30px;
-  color: #fff;
-  top: 0;
-  left: 0;
-}
 .con-btn-list{
   position: absolute;
   padding: 10px;
@@ -92,8 +83,8 @@ const changeControl = (e: MouseEvent) => {
   cursor: pointer;
 }
 canvas{
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   outline: none;
 }
 </style>
