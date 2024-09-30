@@ -56,20 +56,25 @@ class InitThreeScene{
 
   #initCamera(){
     let camera = new THREE.PerspectiveCamera(60, this.container.clientWidth / this.container.clientHeight, 0.1, 3000000);
-    camera.position.set( 10, 5, 20 );
+    camera.position.set(
+      -3.575202802800737,
+      11.116745335949188,
+      8.596187759681352
+    );
     this.camera = camera;
   }
 
-  changeCamera(position?: number[], target?:number[]){
+  changeCamera(position?: number[] | null, target?:number[] | null){
     return new Promise((resolve) => {
       let finish = 0;
+      let duration = 0.4;
       if(position){
         finish++;
         gsap.to(this.camera.position, {
           x: position[0],
           y: position[1],
           z: position[2],
-          duration: 0.5,
+          duration: duration,
           onComplete(){
             finish--;
             if(finish === 0){
@@ -84,7 +89,7 @@ class InitThreeScene{
           x: target[0],
           y: target[1],
           z: target[2],
-          duration: 0.5,
+          duration: duration,
           onComplete(){
             finish--;
             if(finish === 0){
@@ -165,11 +170,7 @@ class InitThreeScene{
     self.controls?.update(delta);
   }
 
-  addAnimate(){
-
-  }
-
-  #initControls(isDisable = false){
+  #initControls(isDisable = true){
     let controls;
     if(this.controls){
       controls = this.controls;
@@ -188,11 +189,22 @@ class InitThreeScene{
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
     controls.enablePan = !isDisable;
+    controls.target.set(
+      -0.5382067615242148 ,
+      2.397269431096525e-18,
+      1.1530877707380645
+    );
     this.controls = controls;
   }
 
+
+
   changeDisableControls(isDisable: boolean){
-    this.#initControls(isDisable);
+    console.log(isDisable);
+    this.controls.enableZoom = !isDisable;
+    this.controls.enableDamping = !isDisable; // an animation loop is required when either damping or auto-rotation are enabled
+    this.controls.enableRotate = !isDisable;
+    this.controls.enablePan = !isDisable;
   }
 
   #onWindowResize(self: InitThreeScene){

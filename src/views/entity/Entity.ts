@@ -1,4 +1,4 @@
-import type { Mesh, LineSegments } from 'three'
+import type { Mesh, LineSegments, Vector3 } from 'three'
 
 
 export type MYMESH = Mesh | LineSegments;
@@ -11,7 +11,7 @@ export default class Entity {
     mesh.receiveShadow = true
   }
 
-  get position() {
+  get position():Vector3 {
     return this.mesh.position
   }
 

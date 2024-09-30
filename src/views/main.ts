@@ -2,20 +2,24 @@ import type InitThreeScene from "./InitThreeScene";
 import initThreeScene from "./InitThreeScene";
 import DrawMaze from "./DrawMaze";
 import computedMazeArr from "./computedMazeArr";
-import {getElementById} from "./mazeUnit";
+import {getStorage, setLocalStorage} from "@/views/mazeUnit";
 
 export type DrawMazeOptions = {
   canvas: HTMLCanvasElement;
+  onLevelUpgrade?: () => void;
 }
 class MazeOfDouDou {
   private threeObj: typeof InitThreeScene;
   public level:number
   public drawMaze: DrawMaze;
+  options: DrawMazeOptions;
 
   constructor(options: DrawMazeOptions) {
-    this.level = 1;
+    let level = +(getStorage('mazeLevel') || '1')
+    this.level = level;
     this.threeObj = initThreeScene;
     this.threeObj.init(options);
+    this.options = options;
     this.drawMaze = new DrawMaze({
       upgradeLevel: () => {
         this.#upgradeLevel();
@@ -25,22 +29,22 @@ class MazeOfDouDou {
   }
 
   getCameraMsg(){
-    console.log(this.threeObj.camera.position)
-    console.log(this.threeObj.controls.target)
+    // console.log(this.threeObj.camera.position)
+    // console.log(this.threeObj.controls.target)
   }
 
   #upgradeLevel(){
     this.level++;
-    getElementById('levelCon').innerHTML = `当前关卡：${this.level}`;
+    setLocalStorage('mazeLevel', this.level);
+    if(this.options.onLevelUpgrade){
+      this.options.onLevelUpgrade.call(this);
+    }
     this.#init();
   }
 
   #init() {
-    this.#changeCameraPosition().then(() => {
-      const mazeArr = computedMazeArr.getLevelMaze(this.level);
-      this.drawMaze.initOne(mazeArr!, this.level);
-    })
-
+    const mazeArr = computedMazeArr.getLevelMaze(this.level);
+    this.drawMaze.init(mazeArr!, this.level);
   }
 
   #changeCameraPosition(){

@@ -7,20 +7,23 @@ const config = reactive({
   directionalLightColor: '#ffffff', //方向光颜色
   directionalLightIntensity: 2.5, //方向光强度
 
-  isDisabledControls: false, //是否禁用控制器
+  isDisabledControls: true, //是否禁用控制器
 
   groundHeight: -0.4, //地面高度,
   conBackgroundColor: '#ca6b35', //容器背景颜色
+  // groundColor: '#000', //地面颜色
   groundColor: '#f88443', //地面颜色
   personColor: '#ff470a',
 
-  addGroundWireframe: true, //是否添加地面网格线
+  addGroundWireframe: false, //是否添加地面网格线
 
   levelStart: 11,
   levelStep: 10,
   levelSplitNum: 10,
 
   startPoint: [0, 1],
+
+  firstControlLevel: 10,
 })
 
 // 改变控制器状态

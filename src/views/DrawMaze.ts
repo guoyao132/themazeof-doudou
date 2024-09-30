@@ -7,14 +7,13 @@ import Wall from "./entity/Wall";
 import computedMazeArr from "./computedMazeArr";
 import Stone from "./entity/Stone";
 import Tree from "./entity/Tree";
+import LevelText from "./entity/LevelText";
 import config from "./config";
 import {floatSub, floatAdd, getWindowObject} from "./mazeUnit";
+import * as THREE from "three";
+import type {Vector3} from "three";
 import {gsap} from "gsap";
 import type {MYMESH} from "./entity/Entity";
-import * as THREE from "three";
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import {FontLoader, Font} from "three/examples/jsm/loaders/FontLoader";
-import FONT from 'three/examples/fonts/helvetiker_bold.typeface.json'
 
 type DrawMazeOptions = {
   upgradeLevel: () => void
@@ -25,13 +24,12 @@ class DrawMaze {
   private threeObj: typeof InitThreeScene;
   private mazeArr: string[][] = [];
   private personObj: Person | null = null;
-  private removeObjArr: Array<Wall | Stone | Tree> = [];
+  private removeObjArr: Array<Wall | Stone | Tree | Ground | LevelText> = [];
   private options: DrawMazeOptions;
   private isInit: boolean = false;
   private isUpLevel: boolean = false;
   private treePosArr: string[] = [];
   private size: number = 0;
-  private FontObj: Font | null = null;
   constructor(options: DrawMazeOptions) {
     this.threeObj = initThreeScene;
     this.options = options;
@@ -98,7 +96,6 @@ class DrawMaze {
   drawTree(){
     let center = Math.floor(this.size / 2);
     const treeNum = Math.floor(center * center * 2);
-    console.log(treeNum);
     for (let i = 0; i < treeNum; i++) {
       let tree = new Tree();
       let [x, y] = this.getTreePos();
@@ -119,36 +116,13 @@ class DrawMaze {
     this.personObj = person;
     this.threeObj.scene.add(person.mesh);
 
-
-    this.setLevelText('LEVEL 1')
   }
 
   setLevelText(text:string){
-    if(!this.FontObj){
-      let loader = new FontLoader();
-      this.FontObj = loader.parse(FONT);
-    }
-
-    console.log(this.FontObj);
-    let geometry = new TextGeometry(text, {
-      size: 1, //字号大小，一般为大写字母的高度
-      height: 0.1, //文字的厚度
-      curveSegments: 12,//弧线分段数，使得文字的曲线更加光滑
-      weight: 'bold', //值为'normal'或'bold'，表示是否加粗
-      font: this.FontObj, //字体，默认是'helvetiker'，需对应引用的字体文件
-      style: 'normal', //值为'normal'或'italics'，表示是否斜体 bevelThickness: 1, //倒角厚度
-      bevelSize: 0.01, //倒角宽度
-      bevelThickness: 0.01, //倒角厚度
-      bevelEnabled: true, //布尔值，是否使用倒角，意为在边缘处斜切
-    });
-    const textMaterial = new THREE.MeshPhongMaterial({
-      color: new THREE.Color(0x686de0),
-      flatShading: true,
-      side: 0
-    });
-    let text1 = new THREE.Mesh(geometry, textMaterial);
-    text1.name = 'text';
-    this.threeObj.scene.add(text1);
+    let levelText = new LevelText(text);
+    levelText.mesh.position.set(-text.length / 3, 1, -this.size / 2);
+    this.threeObj.scene.add(levelText.mesh);
+    this.removeObjArr.push(levelText);
   }
 
   init(mazeArr: string[][], level: number){
@@ -158,13 +132,13 @@ class DrawMaze {
     this.isUpLevel = false;
     this.isInit = true;
     this.level = level;
-    if(level === 1){
-      let ground = new Ground(this.level);
-      this.threeObj.scene.add(ground.mesh);
 
-    }
+    let ground = new Ground(this.level);
+    this.threeObj.scene.add(ground.mesh);
+    this.removeObjArr.push(ground);
     let size = computedMazeArr.getSize(this.level);
     this.size = size;
+    this.setLevelText(`LEVEL ${this.level}`)
     this.mazeArr = mazeArr;
     let len = mazeArr.length;
     for (let i = 0; i < len; i++) {
@@ -183,6 +157,11 @@ class DrawMaze {
               this.personObj = person;
             }else{
               this.personObj.setMeshPosition([x, y]);
+            }
+            if(this.level >= config.firstControlLevel){
+              this.personObj.mesh.scale.set(0.25,0.25,0.25)
+              this.personObj.mesh.position.y = -0.31;
+              this.moveCameraPosition([x, y]);
             }
             break
           case 'end':
@@ -229,7 +208,7 @@ class DrawMaze {
           x: 0,
           y: 0,
           z: 0,
-          duration: 1,
+          duration: 0.3,
           ease: 'elastic.out(1.1, 0.8)',
           stagger: {
             grid: [10, 10],
@@ -255,7 +234,7 @@ class DrawMaze {
           x: 0,
           y: 0,
           z: 0,
-          duration: 1,
+          duration: 0.3,
           ease: 'elastic.out(0.8, 1.1)',
           stagger: {
             grid: [10, 10],
@@ -270,8 +249,8 @@ class DrawMaze {
   }
 
   addPersonMoveFun(key:string){
-    let offset:number[][] = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-    let offsetIndex = 0;
+    let offset:number[][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+    let offsetIndex = -1;
     switch (key){
       case 'ArrowUp':
       case 'w':
@@ -279,18 +258,41 @@ class DrawMaze {
         break;
       case 'ArrowDown':
       case 's':
-        offsetIndex = 1;
+        offsetIndex = 2;
         break;
       case 'ArrowLeft':
       case 'a':
-        offsetIndex = 2;
+        offsetIndex = 3;
         break;
       case 'ArrowRight':
       case 'd':
-        offsetIndex = 3;
+        offsetIndex = 1;
         break
     }
-    this.movePerson(offset[offsetIndex])
+
+    if(offsetIndex !== -1){
+      if(this.level >= config.firstControlLevel){
+        if(this.personObj){
+          let target = [this.personObj.target.x,this.personObj.target.z];
+          if(offsetIndex === 0){
+            this.movePerson(target);
+          }else{
+            let index = offset.map(v => v.join(',')).indexOf(target.join(','));
+            if(offsetIndex === 3){
+              index--;
+            }else if(offsetIndex === 1){
+              index++;
+            }
+            (index === -1) && (index = 3);
+            (index === 4) && (index = 0);
+            this.personObj.setTarget(offset[index]);
+            this.moveCameraTarget(offset[index]);
+          }
+        }
+      }else{
+        this.movePerson(offset[offsetIndex])
+      }
+    }
   }
   addPersonMoveEvent(){
     getWindowObject()?.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -298,6 +300,32 @@ class DrawMaze {
         this.addPersonMoveFun(e.key);
       }
     })
+  }
+
+  moveCameraTarget(offset: number[]){
+    if(this.personObj){
+      let position = this.personObj.mesh.position.clone();
+      let pos1 = position.clone().sub(new THREE.Vector3(offset[0], 0, offset[1]));
+      this.moveCameraPosition([position.x, position.z]);
+    }
+  }
+
+  moveCameraPosition(position:number[]){
+    if(this.personObj){
+      let personTarget = this.personObj.target;
+      let personY = this.personObj.mesh.position.y;
+      let pos = new THREE.Vector3(position[0], personY, position[1]);
+      let pos1 = pos.clone().sub(personTarget);
+      this.threeObj.changeCamera([
+        pos1.x,
+        pos1.y + 0.6,
+        pos1.z,
+      ], [
+        pos.x,
+        pos.y + 0.4,
+        pos.z,
+      ]).then(() => {})
+    }
   }
 
   movePerson(offset:number[]){
@@ -310,7 +338,12 @@ class DrawMaze {
       let y = floatAdd(newY, Math.floor(size / 2));
       if(this.isArea(x, y)){
         if(this.mazeArr[x][y] === 'road' || this.mazeArr[x][y] === 'start'){
-          this.personObj.addMoveEvent([newX, newY])
+          let moveY = 0.3;
+          this.personObj.addMoveEvent([newX, newY], moveY);
+          if(this.level >= config.firstControlLevel){
+            // moveY = 0;
+            this.moveCameraPosition([newX, newY])
+          }
         } else if(this.mazeArr[x][y] === 'end'){
           this.isUpLevel = true;
           this.personObj.addMoveEvent([newX, newY])

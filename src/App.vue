@@ -1,13 +1,12 @@
 <template>
-  <div class="con" id="three-con">
-    <div class="con-level" id="levelCon">当前关卡：1</div>
+  <div class="con" id="three-con" @dblclick.stop.prevent="changeControl">
     <div class="con-btn-list">
       <div class="con-btn-list-item">
         <div class="btn" id="btnW" @click="personMoveFun('w')">W</div>
       </div>
       <div class="con-btn-list-item">
         <div class="btn" id="btnA" @click="personMoveFun('a')">A</div>
-        <div class="btn" id="btnS" @click="personMoveFun('s')">S</div>
+        <div class="btn" v-show="showBtnS" id="btnS" @click="personMoveFun('s')">S</div>
         <div class="btn" id="btnD" @click="personMoveFun('d')">D</div>
       </div>
     </div>
@@ -19,19 +18,33 @@
 import {onMounted, ref} from 'vue'
 import type {Ref} from 'vue'
 import MazeOfDouDou from "@/views/main";
+import {getStorage} from '@/views/mazeUnit'
+import config from "@/views/config";
 
 let mazeObj: MazeOfDouDou;
 let threeCanvas:Ref<HTMLCanvasElement | null> = ref(null);
+const showBtnS = ref<boolean>(true);
 onMounted(() => {
   mazeObj = new MazeOfDouDou({
     canvas: threeCanvas.value!,
+    onLevelUpgrade() {
+      if(this.level >= 10){
+        showBtnS.value = false;
+      }
+    },
   });
 })
-
+let levelStorage = +(getStorage('mazeLevel') || '1');
+if(levelStorage >= 10){
+  showBtnS.value = false;
+}
 const personMoveFun = (key: string) => {
   if(mazeObj && mazeObj.drawMaze){
     mazeObj.drawMaze.addPersonMoveFun(key);
   }
+}
+const changeControl = (e: MouseEvent) => {
+  (e.ctrlKey && e.shiftKey) && (config.isDisabledControls = !config.isDisabledControls)
 }
 </script>
 <style scoped>

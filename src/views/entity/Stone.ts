@@ -28,7 +28,7 @@ class Stone extends Entity{
 
     const mesh = new THREE.Mesh(geometry, material)
     mesh.scale.set(1.3, 3.5, 1.3, )
-    mesh.rotation.z = Math.random() - 0.5
+    // mesh.rotation.z = (Math.random() * 0.3) - 0.3
 
     super(mesh);
     mesh.castShadow = false

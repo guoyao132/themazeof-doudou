@@ -63,12 +63,16 @@ export const floatSub = (num1:number, num2:number):number => {
   return Number((Math.round(num1 * m - num2 * m) / m).toFixed(n));
 }
 
-export const getElementById = (id:string):HTMLElement => {
-  return document.getElementById(id)!;
-}
-
 export const getWindowObject = ():Window => {
   return window;
+}
+
+export const setLocalStorage = (key: string, value: any) => {
+  window.localStorage.setItem(key, value);
+}
+
+export const getStorage = (key: string) => {
+  return window.localStorage.getItem(key);
 }
 
 export const getWindowDevicePixelRatio = ():number => {
