@@ -30,6 +30,7 @@ class DrawMaze {
   private isUpLevel: boolean = false;
   private treePosArr: string[] = [];
   private size: number = 0;
+  private isChangeCamera: boolean = false;
   constructor(options: DrawMazeOptions) {
     this.threeObj = initThreeScene;
     this.options = options;
@@ -277,6 +278,10 @@ class DrawMaze {
           if(offsetIndex === 0){
             this.movePerson(target);
           }else{
+            if(this.isChangeCamera){
+              return
+            }
+            this.isChangeCamera = true;
             let index = offset.map(v => v.join(',')).indexOf(target.join(','));
             if(offsetIndex === 3){
               index--;
@@ -311,20 +316,22 @@ class DrawMaze {
   }
 
   moveCameraPosition(position:number[]){
-    if(this.personObj){
+    if(this.personObj && !this.isUpLevel){
       let personTarget = this.personObj.target;
       let personY = this.personObj.mesh.position.y;
       let pos = new THREE.Vector3(position[0], personY, position[1]);
       let pos1 = pos.clone().sub(personTarget);
       this.threeObj.changeCamera([
         pos1.x,
-        pos1.y + 0.6,
+        pos1.y + 2,
         pos1.z,
       ], [
         pos.x,
-        pos.y + 0.4,
+        pos.y + 1.2,
         pos.z,
-      ]).then(() => {})
+      ]).then(() => {
+        this.isChangeCamera = false;
+      })
     }
   }
 
